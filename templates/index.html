@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>yt-dlp Web Streamer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>YouTube downloader</h1>
+        <form method="POST" action="/download">
+            <label for="url">動画URL:</label>
+            <input type="text" id="url" name="url" placeholder="ダウンロードしたい動画のURLを入力" required>
+            <button type="submit">ダウンロード＆送信</button>
+        </form>
+    </div>
+</body>
+</html>

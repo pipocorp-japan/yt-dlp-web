@@ -1,0 +1,46 @@
+name: Build and Push Docker Image to GHCR
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  # ⚠️ ここを【リポジトリオーナー名】/【リポジトリ名】に書き換えてください ⚠️
+  # 例: octocat/yt-dlp-web-streamer
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build_and_push:
+    runs-on: ubuntu-latest
+    
+    # GHCRを使うため、リポジトリにパッケージの書き込み権限を与える
+    permissions:
+      contents: read
+      packages: write
+      
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # 1. GitHub Packagesへのログイン
+      # ユーザー名にGITHUB_ACTOR（実行ユーザー名）、パスワードにGITHUB_TOKENを使用
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }} # GitHub Actionsが自動生成するトークン
+
+      # 2. Dockerイメージのビルドとプッシュ
+      - name: Build and push Docker image to GHCR
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          # GHCRのレジストリとイメージ名を指定
+          tags: |
+            ghcr.io/${{ env.IMAGE_NAME }}:latest
+            ghcr.io/${{ env.IMAGE_NAME }}:${{ github.sha }}
